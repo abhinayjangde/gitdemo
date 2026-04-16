@@ -6,4 +6,6 @@ const server = http.createServer((req, res) => {
     res.end("hello")
 })
 
-server.listen(4000)
+server.listen(process.env.PORT, () => {
+    console.log("server is running at 4000")
+})
