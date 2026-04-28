@@ -31,24 +31,50 @@ app.post("/get-presigned-url", async (req, res) => {
 app.post("/api/products", async (req, res) => {
     const { name, description, price, image } = req.body;
     // TODO: validate the request using zod
-    if (!name || !description || !price || !image) {
-        return res.status(400).json({
-            success: false,
-            message: "Missing required fields"
+    try {
+        if (!name || !description || !price || !image) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing required fields"
+            });
+        }
+        // save to database
+        // TODO: handler errors
+        const product = await ProductModel.create({
+            name,
+            description,
+            price,
+            image
+        });
+        res.status(200).json({
+            success: true,
+            message: "Product created successfully"
         });
     }
-    // save to database
-    // TODO: handler errors
-    const product = await ProductModel.create({
-        name,
-        description,
-        price,
-        image
-    });
-    res.status(200).json({
-        success: true,
-        message: "Product created successfully"
-    });
+    catch (error) {
+        console.error("Error creating product:", error);
+        res.status(500).json({
+            success: false,
+            message: "error creating product"
+        });
+    }
+});
+app.get("/api/products", async (req, res) => {
+    try {
+        const products = await ProductModel.find();
+        res.status(200).json({
+            success: true,
+            message: "Products fetched successfully",
+            products
+        });
+    }
+    catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).json({
+            success: false,
+            message: "error fetching products"
+        });
+    }
 });
 app.listen(port, (err) => {
     console.log(`server is running at http://localhost:${port}`);
